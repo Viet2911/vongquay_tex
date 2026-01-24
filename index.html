@@ -1,296 +1,135 @@
 <!DOCTYPE html>
-<html lang="vi">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vòng Quay May Mắn - TEX EDU</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #fbe10e 0%, #f9d003 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-        }
-
-        h1 {
-            color: #d4af37;
-            margin-bottom: 20px;
-            font-size: 1.6em;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-            text-align: left;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-        }
-
-        input:focus {
-            border-color: #fbe10e;
-        }
-
-        .wheel-section {
-            display: none;
-            position: relative;
-        }
-
-        .wheel-wrapper {
-            position: relative;
-            width: 340px;
-            height: 340px;
-            margin: 0 auto 20px;
-        }
-
-        #wheel-svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-            transition: transform 5s cubic-bezier(0.1, 0.7, 0.1, 1);
-        }
-
-        .arrow {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid #ff4757;
-            z-index: 10;
-            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
-        }
-
-        .center-dot {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 50%;
-            z-index: 5;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: bold;
-            color: #d4af37;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 15px;
-            background: #fbe10e;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 17px;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #d4af37;
-        }
-
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #d4af37;
-        }
-
-        .btn:disabled {
-            background: #ccc;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
-        .result {
-            margin-top: 15px;
-            padding: 15px;
-            background: #fffde7;
-            border-radius: 10px;
-            display: none;
-            border: 2px dashed #f9d003;
-        }
-    </style>
+  <meta charset="UTF-8">
+    <title>Vòng Quay May Mắn - Tex Edu</title>
+  <style>
+    body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #fff5e6; padding: 20px; }
+    .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+    .btn { width: 100%; padding: 12px; background: #e67e22; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+    .btn:disabled { background: #ccc; cursor: not-allowed; }
+    
+    #wheel-section { display: none; }
+    #wheel-container { position: relative; width: 320px; height: 320px; margin: 20px auto; }
+    #canvas { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #f39c12; transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); }
+    #pointer { 
+      position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+      width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
+      border-top: 40px solid #c0392b; z-index: 10;
+    }
+    #status { font-weight: bold; color: #d35400; margin-top: 15px; }
+  </style>
 </head>
-
 <body>
 
-    <div class="container">
-        <h1>🎡 Vòng Quay May Mắn</h1>
+<div class="container">
+  <div id="form-section">
+    <h2 style="color: #d35400;">TEX EDU</h2>
+    <p>Nhập thông tin để nhận lượt quay</p>
+    <input type="text" id="name" placeholder="Họ và tên" required>
+    <input type="number" id="age" placeholder="Tuổi" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="tel" id="phone" placeholder="Số điện thoại" required>
+    <button class="btn" id="btnNext" onclick="validateAndShow()">TIẾP TỤC</button>
+  </div>
 
-        <div id="formSection">
-            <div class="form-group"><input type="text" id="name" placeholder="Họ và tên"></div>
-            <div class="form-group"><input type="tel" id="phone" placeholder="Số điện thoại"></div>
-            <div class="form-group"><input type="email" id="email" placeholder="Email"></div>
-            <button class="btn" onclick="submitForm()">TIẾP TỤC</button>
-        </div>
-
-        <div id="wheelSection" class="wheel-section">
-            <div class="wheel-wrapper">
-                <div class="arrow"></div>
-                <div class="center-dot">TEX</div>
-                <svg id="wheel-svg" viewBox="0 0 100 100"></svg>
-            </div>
-            <button class="btn" id="spinBtn" onclick="spin()">QUAY NGAY</button>
-            <div id="result" class="result">
-                <p>🎉 Chúc mừng bạn đã trúng:</p>
-                <strong id="prizeText" style="font-size: 1.3em; color: #e67e22;"></strong>
-            </div>
-        </div>
+  <div id="wheel-section">
+    <h3 id="welcome"></h3>
+    <div id="wheel-container">
+      <div id="pointer"></div>
+      <canvas id="canvas" width="500" height="500"></canvas>
     </div>
+    <button class="btn" id="btnSpin" onclick="startSpin()">QUAY NGAY</button>
+    <p id="status"></p>
+  </div>
+</div>
 
-    <script>
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyw7TtqqXY5lKk7TAeDPiQVtf5B1SJDICkEA_GA5sCZngxeHwRrMI_LelUfEi0knvzkag/exec';
+<script>
+  let userData = {};
+  const rewards = ["Học phí 799k", "Giáo trình", "10h với GV", "Balo Tex", "Vở Tex", "10h Ngữ pháp", "Đốc lịch Tex"];
+  const colors = ["#f39c12", "#e67e22", "#f1c40f", "#e67e22", "#f39c12", "#f1c40f", "#e67e22"];
 
-        const prizes = [
-            { text: '10h học GVNN', color: '#FF6B6B' },
-            { text: 'Balo Tex Edu', color: '#FFA500' },
-            { text: 'Vở Tex Edu', color: '#FFD93D' },
-            { text: '10h Ngữ Pháp', color: '#6BCF7F' },
-            { text: 'Lịch Tex Edu', color: '#4ECDC4' },
-            { text: 'Gói 799k/tháng', color: '#95E1D3' },
-            { text: '1 tháng học bổng 100% GVNN', color: '#A29BFE' }, // Chuỗi rất dài
-            { text: 'Học bổng Tex', color: '#FD79A8' }
-        ];
+  function validateAndShow() {
+    userData = {
+      name: document.getElementById('name').value,
+      age: document.getElementById('age').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value
+    };
 
-        let userData = {};
-        let isSpinning = false;
+    if(!userData.name || !userData.phone || !userData.email) {
+      alert("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
 
-        // Hàm xử lý cắt chữ thông minh
-        function truncateText(text, maxLength) {
-            if (text.length > maxLength) {
-                return text.substring(0, maxLength - 3) + "...";
-            }
-            return text;
-        }
+    document.getElementById('btnNext').disabled = true;
+    document.getElementById('status').innerText = "Đang kiểm tra...";
 
-        function drawWheel() {
-            const svg = document.getElementById('wheel-svg');
-            const numPrizes = prizes.length;
-            const angleStep = 360 / numPrizes;
-
-            prizes.forEach((prize, i) => {
-                const startAngle = i * angleStep;
-                const endAngle = (i + 1) * angleStep;
-
-                // 1. Vẽ nan quạt
-                const x1 = 50 + 50 * Math.cos(Math.PI * startAngle / 180);
-                const y1 = 50 + 50 * Math.sin(Math.PI * startAngle / 180);
-                const x2 = 50 + 50 * Math.cos(Math.PI * endAngle / 180);
-                const y2 = 50 + 50 * Math.sin(Math.PI * endAngle / 180);
-
-                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                path.setAttribute("d", `M 50 50 L ${x1} ${y1} A 50 50 0 0 1 ${x2} ${y2} Z`);
-                path.setAttribute("fill", prize.color);
-                path.setAttribute("stroke", "#ffffff");
-                path.setAttribute("stroke-width", "0.4");
-                svg.appendChild(path);
-
-                // 2. Vẽ chữ với Padding 10px (tương ứng khoảng 10 đơn vị trong viewBox 100)
-                const textAngle = startAngle + angleStep / 2;
-
-                // Bán kính chữ là 35 (cách tâm 35 đơn vị, cách rìa 15 đơn vị - đóng vai trò padding rìa)
-                const textX = 50 + 32 * Math.cos(Math.PI * textAngle / 180);
-                const textY = 50 + 32 * Math.sin(Math.PI * textAngle / 180);
-
-                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                text.setAttribute("x", textX);
-                text.setAttribute("y", textY);
-                text.setAttribute("fill", "white");
-                text.setAttribute("font-size", "2.8"); // Size chữ nhỏ để vừa ô 8
-                text.setAttribute("font-weight", "bold");
-                text.setAttribute("text-anchor", "middle");
-                text.setAttribute("dominant-baseline", "middle");
-                text.setAttribute("transform", `rotate(${textAngle + 90}, ${textX}, ${textY})`);
-
-                // Giới hạn khoảng 18-20 ký tự cho nan quạt 8 ô để không chạm rìa
-                text.textContent = truncateText(prize.text, 18);
-
-                svg.appendChild(text);
-            });
-        }
-
-        function submitForm() {
-            const name = document.getElementById('name').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const email = document.getElementById('email').value.trim();
-
-            if (!name || !phone || !email) return alert("Vui lòng nhập đủ thông tin!");
-            if (localStorage.getItem('spun_' + email)) return alert("Email này đã tham gia!");
-
-            userData = { name, phone, email };
-            document.getElementById('formSection').style.display = 'none';
-            document.getElementById('wheelSection').style.display = 'block';
-        }
-
-        function spin() {
-            if (isSpinning) return;
-            isSpinning = true;
-            document.getElementById('spinBtn').disabled = true;
-
-            const wheelSvg = document.getElementById('wheel-svg');
-            const randomDeg = Math.floor(Math.random() * 360);
-            const totalDeg = 3600 + randomDeg;
-
-            wheelSvg.style.transform = `rotate(${totalDeg - 90}deg)`;
-
-            setTimeout(() => {
-                const actualDeg = totalDeg % 360;
-                const angleStep = 360 / prizes.length;
-                const prizeIndex = Math.floor((360 - actualDeg) / angleStep) % prizes.length;
-                const winner = prizes[prizeIndex];
-
-                document.getElementById('prizeText').innerText = winner.text;
-                document.getElementById('result').style.display = 'block';
-
-                saveToSheet(winner.text);
-                localStorage.setItem('spun_' + userData.email, true);
-            }, 5000);
-        }
-
-        async function saveToSheet(prizeName) {
-            const data = { ...userData, prize: prizeName, time: new Date().toLocaleString() };
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-            } catch (e) { console.log("Lỗi gửi dữ liệu"); }
-        }
-
+    google.script.run.withSuccessHandler(res => {
+      if(res.status === 'error') {
+        alert(res.message);
+        document.getElementById('btnNext').disabled = false;
+        document.getElementById('status').innerText = "";
+      } else {
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('wheel-section').style.display = 'block';
+        document.getElementById('welcome').innerText = "Chào " + userData.name + "!";
+        document.getElementById('status').innerText = "";
         drawWheel();
-    </script>
-</body>
+      }
+    }).checkUser(userData);
+  }
 
+  function drawWheel() {
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const arc = (2 * Math.PI) / rewards.length;
+    rewards.forEach((reward, i) => {
+      ctx.beginPath();
+      ctx.fillStyle = colors[i];
+      ctx.moveTo(250, 250);
+      ctx.arc(250, 250, 250, i * arc, (i + 1) * arc);
+      ctx.fill();
+      ctx.save();
+      ctx.translate(250, 250);
+      ctx.rotate(i * arc + arc / 2);
+      ctx.fillStyle = "white";
+      ctx.font = "bold 22px Arial";
+      ctx.textAlign = "right";
+      ctx.fillText(reward, 230, 10);
+      ctx.restore();
+    });
+  }
+
+  let currentRotation = 0;
+  function startSpin() {
+    document.getElementById('btnSpin').disabled = true;
+    
+    // TỈ LỆ: Bỏ qua Balo (Index số 3 trong mảng rewards)
+    const validIndices = [0, 1, 2, 4, 5, 6]; 
+    const randomIndex = validIndices[Math.floor(Math.random() * validIndices.length)];
+    const finalReward = rewards[randomIndex];
+
+    // Tính toán góc quay để kim dừng đúng ô đã chọn
+    const segmentDeg = 360 / rewards.length;
+    const targetDeg = (rewards.length - 1 - randomIndex) * segmentDeg + (segmentDeg / 2);
+    const totalSpin = currentRotation + (360 * 5) + targetDeg - (currentRotation % 360); 
+    
+    currentRotation = totalSpin;
+    const canvas = document.getElementById('canvas');
+    canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+    setTimeout(() => {
+      userData.reward = finalReward;
+      document.getElementById('status').innerText = "Đang lưu kết quả...";
+      
+      google.script.run.withSuccessHandler(res => {
+        document.getElementById('status').innerText = "CHÚC MỪNG: " + finalReward.toUpperCase();
+        alert("Bạn đã trúng: " + finalReward);
+      }).saveReward(userData);
+    }, 4000);
+  }
+</script>
+</body>
 </html>
