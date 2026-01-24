@@ -1,135 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vòng Quay May Mắn - Tex Edu</title>
-  <style>
-    body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #fff5e6; padding: 20px; }
-    .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-    .btn { width: 100%; padding: 12px; background: #e67e22; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
-    .btn:disabled { background: #ccc; cursor: not-allowed; }
-    
-    #wheel-section { display: none; }
-    #wheel-container { position: relative; width: 320px; height: 320px; margin: 20px auto; }
-    #canvas { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #f39c12; transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); }
-    #pointer { 
-      position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-      width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
-      border-top: 40px solid #c0392b; z-index: 10;
-    }
-    #status { font-weight: bold; color: #d35400; margin-top: 15px; }
-  </style>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; background: #fff5e6; margin: 0; padding: 20px; }
+        .container { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 420px; text-align: center; }
+        input { width: 95%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        button { width: 100%; padding: 15px; background: #e67e22; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 18px; margin-top: 10px; transition: 0.3s; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        #wheel-section { display: none; margin-top: 20px; }
+        #canvas-container { position: relative; width: 320px; height: 320px; margin: 0 auto; }
+        #canvas { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #d35400; transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); }
+        #pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #c0392b; z-index: 10; }
+        #status { font-weight: bold; color: #e67e22; margin-top: 15px; min-height: 24px; }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <div id="form-section">
-    <h2 style="color: #d35400;">TEX EDU</h2>
-    <p>Nhập thông tin để nhận lượt quay</p>
-    <input type="text" id="name" placeholder="Họ và tên" required>
-    <input type="number" id="age" placeholder="Tuổi" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="tel" id="phone" placeholder="Số điện thoại" required>
-    <button class="btn" id="btnNext" onclick="validateAndShow()">TIẾP TỤC</button>
-  </div>
-
-  <div id="wheel-section">
-    <h3 id="welcome"></h3>
-    <div id="wheel-container">
-      <div id="pointer"></div>
-      <canvas id="canvas" width="500" height="500"></canvas>
+    <div id="form-section">
+        <h2 style="color: #d35400;">TEX EDU</h2>
+        <p>Vui lòng điền thông tin để tham gia</p>
+        <input type="text" id="name" placeholder="Họ và tên" required>
+        <input type="number" id="age" placeholder="Tuổi" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="tel" id="phone" placeholder="Số điện thoại" required>
+        <button id="btnNext" onclick="checkInfo()">TIẾP TỤC</button>
     </div>
-    <button class="btn" id="btnSpin" onclick="startSpin()">QUAY NGAY</button>
-    <p id="status"></p>
-  </div>
+
+    <div id="wheel-section">
+        <h3 id="user-greeting" style="color: #d35400;"></h3>
+        <div id="canvas-container">
+            <div id="pointer"></div>
+            <canvas id="canvas" width="500" height="500"></canvas>
+        </div>
+        <button id="btnSpin" onclick="spinNow()">QUAY NGAY</button>
+        <p id="status"></p>
+    </div>
 </div>
 
 <script>
-  let userData = {};
-  const rewards = ["Học phí 799k", "Giáo trình", "10h với GV", "Balo Tex", "Vở Tex", "10h Ngữ pháp", "Đốc lịch Tex"];
-  const colors = ["#f39c12", "#e67e22", "#f1c40f", "#e67e22", "#f39c12", "#f1c40f", "#e67e22"];
+    // LINK WEB APP CỦA BẠN
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyw7TtqqXY5lKk7TAeDPiQVtf5B1SJDICkEA_GA5sCZngxeHwRrMI_LelUfEi0knvzkag/exec";
 
-  function validateAndShow() {
-    userData = {
-      name: document.getElementById('name').value,
-      age: document.getElementById('age').value,
-      email: document.getElementById('email').value,
-      phone: document.getElementById('phone').value
-    };
+    const rewards = ["Học phí 799k", "Giáo trình", "10h với GV", "Balo Tex", "Vở Tex", "10h Ngữ pháp", "Đốc lịch Tex"];
+    const colors = ["#f39c12", "#e67e22", "#f1c40f", "#e67e22", "#f39c12", "#f1c40f", "#e67e22"];
+    let userData = {};
+    let currentRotation = 0;
 
-    if(!userData.name || !userData.phone || !userData.email) {
-      alert("Vui lòng điền đầy đủ thông tin!");
-      return;
-    }
+    function checkInfo() {
+        userData = {
+            name: document.getElementById('name').value,
+            age: document.getElementById('age').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value
+        };
 
-    document.getElementById('btnNext').disabled = true;
-    document.getElementById('status').innerText = "Đang kiểm tra...";
+        if(!userData.name || !userData.phone || !userData.email) {
+            alert("Vui lòng điền đầy đủ thông tin!");
+            return;
+        }
 
-    google.script.run.withSuccessHandler(res => {
-      if(res.status === 'error') {
-        alert(res.message);
-        document.getElementById('btnNext').disabled = false;
-        document.getElementById('status').innerText = "";
-      } else {
+        // Ẩn form hiện vòng quay (Bước này cho phép trải nghiệm mượt mà)
         document.getElementById('form-section').style.display = 'none';
         document.getElementById('wheel-section').style.display = 'block';
-        document.getElementById('welcome').innerText = "Chào " + userData.name + "!";
-        document.getElementById('status').innerText = "";
+        document.getElementById('user-greeting').innerText = "Chào " + userData.name;
         drawWheel();
-      }
-    }).checkUser(userData);
-  }
+    }
 
-  function drawWheel() {
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const arc = (2 * Math.PI) / rewards.length;
-    rewards.forEach((reward, i) => {
-      ctx.beginPath();
-      ctx.fillStyle = colors[i];
-      ctx.moveTo(250, 250);
-      ctx.arc(250, 250, 250, i * arc, (i + 1) * arc);
-      ctx.fill();
-      ctx.save();
-      ctx.translate(250, 250);
-      ctx.rotate(i * arc + arc / 2);
-      ctx.fillStyle = "white";
-      ctx.font = "bold 22px Arial";
-      ctx.textAlign = "right";
-      ctx.fillText(reward, 230, 10);
-      ctx.restore();
-    });
-  }
+    function drawWheel() {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const arc = (2 * Math.PI) / rewards.length;
+        rewards.forEach((reward, i) => {
+            ctx.beginPath();
+            ctx.fillStyle = colors[i];
+            ctx.moveTo(250, 250);
+            ctx.arc(250, 250, 250, i * arc, (i + 1) * arc);
+            ctx.fill();
+            ctx.save();
+            ctx.translate(250, 250);
+            ctx.rotate(i * arc + arc / 2);
+            ctx.fillStyle = "white";
+            ctx.font = "bold 20px Arial";
+            ctx.textAlign = "right";
+            ctx.fillText(reward, 230, 10);
+            ctx.restore();
+        });
+    }
 
-  let currentRotation = 0;
-  function startSpin() {
-    document.getElementById('btnSpin').disabled = true;
-    
-    // TỈ LỆ: Bỏ qua Balo (Index số 3 trong mảng rewards)
-    const validIndices = [0, 1, 2, 4, 5, 6]; 
-    const randomIndex = validIndices[Math.floor(Math.random() * validIndices.length)];
-    const finalReward = rewards[randomIndex];
+    function spinNow() {
+        document.getElementById('btnSpin').disabled = true;
 
-    // Tính toán góc quay để kim dừng đúng ô đã chọn
-    const segmentDeg = 360 / rewards.length;
-    const targetDeg = (rewards.length - 1 - randomIndex) * segmentDeg + (segmentDeg / 2);
-    const totalSpin = currentRotation + (360 * 5) + targetDeg - (currentRotation % 360); 
-    
-    currentRotation = totalSpin;
-    const canvas = document.getElementById('canvas');
-    canvas.style.transform = `rotate(${currentRotation}deg)`;
+        // Tỉ lệ: Balo = 0% (Loại bỏ index 3)
+        const validIndices = [0, 1, 2, 4, 5, 6]; 
+        const randomIndex = validIndices[Math.floor(Math.random() * validIndices.length)];
+        const finalReward = rewards[randomIndex];
 
-    setTimeout(() => {
-      userData.reward = finalReward;
-      document.getElementById('status').innerText = "Đang lưu kết quả...";
-      
-      google.script.run.withSuccessHandler(res => {
-        document.getElementById('status').innerText = "CHÚC MỪNG: " + finalReward.toUpperCase();
-        alert("Bạn đã trúng: " + finalReward);
-      }).saveReward(userData);
-    }, 4000);
-  }
+        // Tính góc quay (xoay ít nhất 5 vòng + góc tới ô quà)
+        const segmentDeg = 360 / rewards.length;
+        const targetDeg = (rewards.length - 1 - randomIndex) * segmentDeg + (segmentDeg / 2);
+        const spinDeg = (currentRotation - (currentRotation % 360)) + 1800 + targetDeg;
+        
+        currentRotation = spinDeg;
+        document.getElementById('canvas').style.transform = `rotate(${currentRotation}deg)`;
+
+        setTimeout(() => {
+            userData.reward = finalReward;
+            document.getElementById('status').innerText = "Đang lưu kết quả...";
+            saveToSheet(userData);
+        }, 4000);
+    }
+
+    function saveToSheet(data) {
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).then(() => {
+            document.getElementById('status').innerText = "CHÚC MỪNG: " + data.reward.toUpperCase();
+            alert("Chúc mừng " + data.name + "! Bạn đã trúng: " + data.reward);
+        }).catch(() => {
+            alert("Lưu kết quả thất bại. Vui lòng thử lại!");
+            document.getElementById('btnSpin').disabled = false;
+        });
+    }
 </script>
 </body>
 </html>
